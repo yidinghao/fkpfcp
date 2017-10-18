@@ -84,10 +84,23 @@ class PrimalLearner(Learner):
         self._curr_guess = None
 
     def _new_name(self):
+        """
+        Generates a unique name in the form of an int.
+
+        :rtype: int
+        :return: A unique int
+        """
         self._name_ctr += 1
         return self._name_ctr - 1
 
     def guess(self):
+        """
+        Makes a guess based on the next observation.
+        Updates self._curr_guess.
+
+        :rtype: CFG
+        :returns: The next guess
+        """
         sentence = next(self._text)
         if sentence in self._data:
             return self._curr_guess
@@ -166,3 +179,21 @@ class PrimalLearner(Learner):
         # Construct the grammar
         self._curr_guess = CFG(self._start_symbol, self._productions)
         return self._curr_guess
+
+    @staticmethod
+    def from_grammar(grammar, k):
+        """
+        Instantiate a PrimalLearner from a grammar.
+
+        :type grammar: CFG
+        :param grammar: A grammar
+
+        :type k: int
+        :param k: The grammar learned will have the k-FKP.
+
+        :rtype: PrimalLearner
+        :return: A PrimalLearner
+        """
+        text = oracles.GrammarText(grammar)
+        oracle = oracles.GrammarOracle(grammar)
+        return PrimalLearner(text, oracle, k)
