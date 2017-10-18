@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from nltk import CFG, ChartParser
 from nltk.parse.generate import generate
 
-from scl import Sentence
+from scl import Sentence, ContextSet, SentenceSet
 
 
 class Text(object):
@@ -60,6 +60,34 @@ class Oracle(object):
         :return: Whether or not the oracle accepts sentence
         """
         return False
+
+    def restr_right_triangle(self, sentences, contexts):
+        result = ContextSet([])
+        for c in contexts:
+            is_valid_context = True
+            for s in c.wrap_set(sentences):
+                if not self.generates(s):
+                    is_valid_context = False
+                    break
+
+            if is_valid_context:
+                result.add(c)
+
+        return result
+
+    def restr_left_triangle(self, contexts, sentences):
+        result = SentenceSet([])
+        for s in sentences:
+            is_valid_substring = True
+            for t in contexts.wrap(s):
+                if not self.generates(t):
+                    is_valid_substring = False
+                    break
+
+            if is_valid_substring:
+                result.add(s)
+
+        return result
 
 
 class GrammarOracle(Oracle):
