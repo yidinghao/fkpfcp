@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from itertools import combinations
 
 from nltk.grammar import CFG, Nonterminal, Production
+from nltk.parse import ChartParser
 
 import oracles
 from scl import Sentence, SentenceSet, Context, ContextSet
@@ -82,6 +83,7 @@ class PrimalLearner(Learner):
         self._productions = set()
         self._start_symbol = Nonterminal("start")
         self._curr_guess = None
+        self._curr_guess_parser = None
 
     def _new_name(self):
         """
@@ -116,10 +118,13 @@ class PrimalLearner(Learner):
                 self._contexts.add(Context(words[:i], words[j:]))
 
         # Update substrings
-        if self._curr_guess is not None:
-            is_new_sentence = not self._curr_guess.generates(sentence)
-        else:
-            is_new_sentence = True
+        is_new_sentence = True
+        if self._curr_guess_parser is not None:
+            try:
+                parses = self._curr_guess_parser.parse(sentence.get_words())
+                is_new_sentence = list(parses) == []
+            except:
+                is_new_sentence = False
         if is_new_sentence:
             for i in range(len(words)):
                 for j in range(i, len(words)):
@@ -181,6 +186,7 @@ class PrimalLearner(Learner):
 
         # Construct the grammar
         self._curr_guess = CFG(self._start_symbol, self._productions)
+        self._curr_guess_parser = ChartParser(self._curr_guess)
         return self._curr_guess
 
     @staticmethod
