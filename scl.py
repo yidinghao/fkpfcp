@@ -68,6 +68,7 @@ class SentenceSet(object):
         :param sentences: A list of Sentences.
         """
         self._sentences = set([s.to_string() for s in sentences])
+        self._name = None
 
     def __iter__(self):
         for s in self._sentences:
@@ -93,6 +94,37 @@ class SentenceSet(object):
         :return: None
         """
         self._sentences = sentences
+
+    def get_name(self):
+        """
+        Get the name of this SentenceSet.
+
+        :return: self._name
+        """
+        return self._name
+
+    def set_name(self, name):
+        """
+        Assign a name to this SentenceSet.
+
+        :param name: A name for this SentenceSet
+
+        :rtype: NoneType
+        :return: None
+        """
+        self._name = name
+
+    def __contains__(self, sentence):
+        """
+        Check if this SentenceSet contains a sentence.
+
+        :type sentence: Sentence
+        :param sentence: A sentence
+
+        :rtype: bool
+        :return: Whether or not this SentenceSet contains sentence.
+        """
+        return sentence.to_string() in self._sentences
 
     def add(self, sentence):
         """
@@ -230,6 +262,7 @@ class ContextSet(object):
         :param contexts: A list of Contexts.
         """
         self._contexts = set([c.to_string_tuple() for c in contexts])
+        self._name = None
 
     def __iter__(self):
         for c in self._contexts:
@@ -255,6 +288,37 @@ class ContextSet(object):
         :return: None
         """
         self._contexts = contexts
+
+    def get_name(self):
+        """
+        Get the name of this ContextSet.
+
+        :return: self._name
+        """
+        return self._name
+
+    def set_name(self, name):
+        """
+        Assign a name to this ContextSet.
+
+        :param name: A name for this ContextSet
+
+        :rtype: NoneType
+        :return: None
+        """
+        self._name = name
+
+    def __contains__(self, context):
+        """
+        Check if this ContextSet contains a context.
+
+        :type context: Context
+        :param context: A context
+
+        :rtype: bool
+        :return: Whether or not this ContextSet contains context.
+        """
+        return context.to_string_tuple() in self._contexts
 
     def add(self, context):
         """
