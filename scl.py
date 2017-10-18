@@ -10,16 +10,25 @@ class Sentence(object):
         :type words: list
         :param words: A list of words
         """
-        self._words = words
+        self._words = tuple(words)
+
+    def __getitem__(self, key):
+        return self._words[key]
 
     def get_words(self):
         """
         Public accessor for self._words.
 
-        :rtype: list
+        :rtype: tuple
         :return: self._words
         """
         return self._words
+
+    def __eq__(self, other):
+        return self._words == other.get_words()
+
+    def __hash__(self):
+        return hash(self._words)
 
     def __add__(self, other):
         if type(other) is Sentence:
@@ -67,12 +76,10 @@ class SentenceSet(object):
         :type sentences: list
         :param sentences: A list of Sentences.
         """
-        self._sentences = set([s.to_string() for s in sentences])
-        self._name = None
+        self._sentences = set(sentences)
 
     def __iter__(self):
-        for s in self._sentences:
-            yield Sentence.from_string(s)
+        return iter(self._sentences)
 
     def get_sentences(self):
         """
@@ -95,25 +102,6 @@ class SentenceSet(object):
         """
         self._sentences = sentences
 
-    def get_name(self):
-        """
-        Get the name of this SentenceSet.
-
-        :return: self._name
-        """
-        return self._name
-
-    def set_name(self, name):
-        """
-        Assign a name to this SentenceSet.
-
-        :param name: A name for this SentenceSet
-
-        :rtype: NoneType
-        :return: None
-        """
-        self._name = name
-
     def __contains__(self, sentence):
         """
         Check if this SentenceSet contains a sentence.
@@ -124,7 +112,13 @@ class SentenceSet(object):
         :rtype: bool
         :return: Whether or not this SentenceSet contains sentence.
         """
-        return sentence.to_string() in self._sentences
+        return sentence in self._sentences
+
+    def __eq__(self, other):
+        return self._sentences == other.get_sentences()
+
+    def __hash__(self):
+        return hash(frozenset(self._sentences))
 
     def add(self, sentence):
         """
@@ -136,7 +130,7 @@ class SentenceSet(object):
         :rtype: NoneType
         :return: None
         """
-        self._sentences.add(sentence.to_string())
+        self._sentences.add(sentence)
 
     def union(self, sentenceset):
         """
@@ -188,8 +182,21 @@ class Context(object):
         :type right: list
         :param right: The right side
         """
-        self._left = left
-        self._right = right
+        self._left = tuple(left)
+        self._right = tuple(right)
+
+    def get_left(self):
+        return self._left
+
+    def get_right(self):
+        return self._right
+
+    def __eq__(self, other):
+        return self._left == other.get_left() and \
+               self._right == other.get_right()
+
+    def __hash__(self):
+        return hash((self._left, self._right))
 
     def wrap(self, sentence):
         """
@@ -261,12 +268,10 @@ class ContextSet(object):
         :type contexts: list
         :param contexts: A list of Contexts.
         """
-        self._contexts = set([c.to_string_tuple() for c in contexts])
-        self._name = None
+        self._contexts = set(contexts)
 
     def __iter__(self):
-        for c in self._contexts:
-            yield Context.from_string_tuple(c)
+        return iter(self._contexts)
 
     def get_contexts(self):
         """
@@ -289,25 +294,6 @@ class ContextSet(object):
         """
         self._contexts = contexts
 
-    def get_name(self):
-        """
-        Get the name of this ContextSet.
-
-        :return: self._name
-        """
-        return self._name
-
-    def set_name(self, name):
-        """
-        Assign a name to this ContextSet.
-
-        :param name: A name for this ContextSet
-
-        :rtype: NoneType
-        :return: None
-        """
-        self._name = name
-
     def __contains__(self, context):
         """
         Check if this ContextSet contains a context.
@@ -318,7 +304,13 @@ class ContextSet(object):
         :rtype: bool
         :return: Whether or not this ContextSet contains context.
         """
-        return context.to_string_tuple() in self._contexts
+        return context in self._contexts
+
+    def __eq__(self, other):
+        return self._contexts == other.get_contexts()
+
+    def __hash__(self):
+        return hash(frozenset(self._contexts))
 
     def add(self, context):
         """
@@ -330,7 +322,7 @@ class ContextSet(object):
         :rtype: NoneType
         :return: None
         """
-        self._contexts.add(context.to_string_tuple())
+        self._contexts.add(context)
 
     def union(self, contextset):
         """
