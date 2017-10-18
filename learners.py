@@ -80,18 +80,18 @@ class PrimalLearner(Learner):
         self._nonterminals = dict()
         self._terminals = set()
         self._productions = set()
-        self._start_symbol = Nonterminal(-1)
+        self._start_symbol = Nonterminal("start")
         self._curr_guess = None
 
     def _new_name(self):
         """
-        Generates a unique name in the form of an int.
+        Generates a unique name.
 
         :rtype: int
         :return: A unique int
         """
         self._name_ctr += 1
-        return self._name_ctr - 1
+        return str(self._name_ctr - 1)
 
     def guess(self):
         """
@@ -101,7 +101,7 @@ class PrimalLearner(Learner):
         :rtype: CFG
         :returns: The next guess
         """
-        sentence = next(self._text)
+        sentence = Sentence(next(self._text))
         if sentence in self._data:
             return self._curr_guess
 
@@ -116,7 +116,10 @@ class PrimalLearner(Learner):
                 self._contexts.add(Context(words[:i], words[j:]))
 
         # Update substrings
-        is_new_sentence = not self._oracle.generates(sentence)
+        if self._curr_guess is not None:
+            is_new_sentence = not self._curr_guess.generates(sentence)
+        else:
+            is_new_sentence = True
         if is_new_sentence:
             for i in range(len(words)):
                 for j in range(i, len(words)):
@@ -147,7 +150,7 @@ class PrimalLearner(Learner):
                         break
 
                 if add_lexical_rule:
-                    rule = Production(nt, [Nonterminal(t)])
+                    rule = Production(nt, [t])
                     self._productions.add(rule)
 
             # Binary rules
