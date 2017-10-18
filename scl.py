@@ -1,6 +1,3 @@
-from nltk import CFG, ChartParser
-
-
 class Sentence(object):
     """
     A sentence.
@@ -23,6 +20,14 @@ class Sentence(object):
         :return: self._words
         """
         return self._words
+
+    def __add__(self, other):
+        if type(other) is Sentence:
+            return Sentence(self._words + other.get_words())
+        elif type(other) is SentenceSet:
+            return SentenceSet([self + s for s in other])
+        else:
+            raise TypeError("Summands must be Sentences or SentenceSets.")
 
     def to_string(self):
         """
@@ -126,6 +131,14 @@ class SentenceSet(object):
         :return: None
         """
         self._sentences.update(sentenceset.get_sentences())
+
+    def __add__(self, other):
+        if type(other) is SentenceSet:
+            return SentenceSet([s + t for s in self for t in other])
+        elif type(other) is Sentence:
+            return SentenceSet([s + other for s in self])
+        else:
+            raise TypeError("Summands must be Sentences or SentenceSets.")
 
 
 class Context(object):
@@ -314,30 +327,3 @@ class ContextSet(object):
             result.update(self.wrap(s))
 
         return result
-
-
-def generates(sentence, grammar=None, parser=None):
-    """
-    Check whether or not a grammar generates a string.
-
-    :type grammar: CFG
-    :param grammar: The grammar to parse from
-
-    :type sentence: list
-    :param sentence: The sentence to parse
-
-    :param parser: A parser for the grammar (optional)
-
-    :rtype: bool
-    :return: Whether or not grammar generates sentence
-    """
-    if grammar is None and parser is None:
-        raise ValueError("A grammar or a parser is required.")
-    if parser is None:
-        parser = ChartParser(grammar)
-
-    try:
-        parses = parser.parse(sentence)
-        return list(parses) != []
-    except:
-        return False
