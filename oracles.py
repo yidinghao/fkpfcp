@@ -16,7 +16,6 @@ class Text(object):
     def __init__(self):
         self._iterator = None
 
-    @abstractmethod
     def __iter__(self):
         return self._iterator
 
@@ -37,8 +36,10 @@ class GrammarText(Text):
         self._iterator = generate(grammar)
 
     def __iter__(self):
-        for i in self._iterator:
-            yield Sentence(i)
+        return self
+
+    def next(self):
+        return next(self._iterator)
 
 
 class Oracle(object):
