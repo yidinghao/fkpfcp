@@ -13,11 +13,8 @@ class Text(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def __init__(self):
-        self._iterator = None
-
-    def __iter__(self):
-        return self._iterator
+    def next(self):
+        pass
 
 
 class GrammarText(Text):
@@ -25,15 +22,14 @@ class GrammarText(Text):
     A text from a grammar.
     """
 
-    def __init__(self, grammar):
+    def __init__(self, grammar, depth=2):
         """
         Initialize from a CFG.
 
         :type grammar: CFG
         :param grammar: A CFG generating the text.
         """
-        super(GrammarText, self).__init__()
-        self._iterator = generate(grammar)
+        self._iterator = generate(grammar, depth=depth)
 
     def __iter__(self):
         return self
