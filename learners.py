@@ -113,8 +113,8 @@ class PrimalLearner(Learner):
         self._terminals.update(set(sentence.get_words()))
 
         # Update contexts
-        for i in range(len(words)):
-            for j in range(i, len(words)):
+        for i in range(1, len(words) + 1):
+            for j in range(i, len(words) + 1):
                 self._contexts.add(Context(words[:i], words[j:]))
 
         # Update substrings
@@ -124,10 +124,11 @@ class PrimalLearner(Learner):
                 parses = self._curr_guess_parser.parse(sentence.get_words())
                 is_new_sentence = list(parses) == []
             except:
-                is_new_sentence = False
+                is_new_sentence = True
+
         if is_new_sentence:
             for i in range(len(words)):
-                for j in range(i, len(words)):
+                for j in range(i, len(words) + 1):
                     self._substrings.add(Sentence(words[i:j]))
 
         # Construct the nonterminals
