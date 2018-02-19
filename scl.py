@@ -15,15 +15,6 @@ class Sentence(object):
     def __getitem__(self, key):
         return self._words[key]
 
-    def get_words(self):
-        """
-        Public accessor for self._words.
-
-        :rtype: tuple
-        :return: self._words
-        """
-        return self._words
-
     def __eq__(self, other):
         return self._words == other.get_words()
 
@@ -37,6 +28,21 @@ class Sentence(object):
             return SentenceSet([self + s for s in other])
         else:
             raise TypeError("Summands must be Sentences or SentenceSets.")
+
+    def __len__(self):
+        return len(self._words)
+
+    def __str__(self):
+        return self.to_string()
+
+    def get_words(self):
+        """
+        Public accessor for self._words.
+
+        :rtype: tuple
+        :return: self._words
+        """
+        return self._words
 
     def to_string(self):
         """
@@ -60,9 +66,6 @@ class Sentence(object):
         """
         return Sentence(string.split(" "))
 
-    def __str__(self):
-        return self.to_string()
-
 
 class SentenceSet(object):
     """
@@ -73,10 +76,12 @@ class SentenceSet(object):
         """
         Initialize from a list of Sentences.
 
-        :type sentences: list
         :param sentences: A list of Sentences.
         """
-        self._sentences = set(sentences)
+        if sentences is not None:
+            self._sentences = set(sentences)
+        else:
+            self._sentences = set()
 
     def __iter__(self):
         return iter(self._sentences)
@@ -120,6 +125,9 @@ class SentenceSet(object):
     def __hash__(self):
         return hash(frozenset(self._sentences))
 
+    def __len__(self):
+        return len(self._sentences)
+
     def add(self, sentence):
         """
         Adds a sentence to this SentenceSet.
@@ -132,19 +140,44 @@ class SentenceSet(object):
         """
         self._sentences.add(sentence)
 
-    def union(self, sentenceset):
+    def difference(self, *others):
+        """
+        Computes the difference of this with another SentenceSet.
+
+        :type others: SentenceSet
+        :param others: Other SentenceSets
+
+        :rtype: SentenceSet
+        :return: The difference of all the SentenceSets.
+        """
+        other_sents = [o.get_sentences() for o in others]
+        return SentenceSet(self._sentences.difference(*other_sents))
+
+    def intersection(self, *others):
+        """
+        Computes the intersection of this with another SentenceSet.
+
+        :type others: SentenceSet
+        :param others: Other SentenceSets
+
+        :rtype: SentenceSet
+        :return: The intersection of all the SentenceSets.
+        """
+        other_sents = [o.get_sentences() for o in others]
+        return SentenceSet(self._sentences.intersection(*other_sents))
+
+    def union(self, *others):
         """
         Computes the union of this with another SentenceSet.
 
-        :type sentenceset: SentenceSet
-        :param sentenceset: Another SentenceSet
+        :type others: SentenceSet
+        :param others: Other SentenceSets
 
         :rtype: SentenceSet
-        :return: The union of the two SentenceSets.
+        :return: The union of all the SentenceSets.
         """
-        new = SentenceSet([])
-        new.set_sentences(self._sentences.union(sentenceset.get_sentences()))
-        return new
+        other_sents = [o.get_sentences() for o in others]
+        return SentenceSet(self._sentences.union(*other_sents))
 
     def update(self, sentenceset):
         """
@@ -265,7 +298,6 @@ class ContextSet(object):
         """
         Initialize from a list of Contexts.
 
-        :type contexts: list
         :param contexts: A list of Contexts.
         """
         self._contexts = set(contexts)
@@ -312,6 +344,9 @@ class ContextSet(object):
     def __hash__(self):
         return hash(frozenset(self._contexts))
 
+    def __len__(self):
+        return len(self._contexts)
+
     def add(self, context):
         """
         Adds a context to this ContextSet.
@@ -323,6 +358,60 @@ class ContextSet(object):
         :return: None
         """
         self._contexts.add(context)
+
+    def intersection(self, *others):
+        """
+        Computes the intersection of this with another ContextSet.
+
+        :type others: ContextSet
+        :param others: Other ContextSets
+
+        :rtype: ContextSet
+        :return: The intersection of all the ContextSets.
+        """
+        other_contexts = [o.get_contexts() for o in others]
+        return ContextSet(self._contexts.intersection(*other_contexts))
+
+    def intersection_update(self, *others):
+        """
+        Computes the intersection of this with another ContextSet,
+        and updates this ContextSet to be the intersection.
+
+        :type others: ContextSet
+        :param others: Other ContextSets
+
+        :return: None
+        """
+        other_contexts = [o.get_contexts() for o in others]
+        self._contexts.intersection_update(*other_contexts)
+
+    def issubset(self, other):
+        """
+        Checks to see if this ContextSet is a subset
+        of another.
+
+        :type other: ContextSet
+        :param other: Another ContextSet
+
+        :rtype: bool
+        :return: True if this ContextSet is a subset of the
+            other, False otherwise
+        """
+        return self._contexts.issubset(other.get_contexts())
+
+    def issuperset(self, other):
+        """
+        Checks to see if this ContextSet is a superset
+        of another.
+
+        :type other: ContextSet
+        :param other: Another ContextSet
+
+        :rtype: bool
+        :return: True if this ContextSet is a superset of the
+            other, False otherwise
+        """
+        return self._contexts.issuperset(other.get_contexts())
 
     def union(self, contextset):
         """

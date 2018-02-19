@@ -22,7 +22,7 @@ class GrammarText(Text):
     A text from a grammar.
     """
 
-    def __init__(self, grammar, depth=2):
+    def __init__(self, grammar, depth=5):
         """
         Initialize from a CFG.
 
